@@ -7,12 +7,20 @@
     "displayFormat": "%.1d",
     "unit": "celsius",
     "shortUnit": "oC",
-    "rangePartitionSelector": "${patient.age}",
+    "normalRangeSelector": "${patient.age}",
     "normalRanges": [
       {
         "partition": {
-          "min": 15,
-          "max": 60
+          "min": 0,
+          "max": 15
+        },
+        "range": {
+          "min": 36,
+          "max": 37.2
+        }
+      },{
+        "partition": {
+          "min": 15
         },
         "range": {
           "min": 35,
