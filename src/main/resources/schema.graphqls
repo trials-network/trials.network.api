@@ -94,7 +94,7 @@ type Condition {
     id: Long!
     state: ConditionState!
     medication: [String!]
-    date: Date
+    date: Date # active (since), inactive (since), history_of (last occurred)
     notes: String
 }
 
