@@ -73,9 +73,6 @@ type Institution {
     id: Long!
     name: String!
     address: String!
-    """
-    Timezone of this location, e.g. America/New_York
-    """
     timezone: String!
     contacts: [InstitutionContact!]
     patients: [Patient]
