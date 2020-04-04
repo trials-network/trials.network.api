@@ -1,0 +1,24 @@
+[
+  {
+    "id": "XX",
+    "group": "Temperature",
+    "name": "Temperature",
+    "shortName": "Temp",
+    "displayFormat": "%.1d",
+    "unit": "celsius",
+    "shortUnit": "oC",
+    "rangePartitionSelector": "${patient.age}",
+    "normalRanges": [
+      {
+        "partition": {
+          "min": 15,
+          "max": 60
+        },
+        "range": {
+          "min": 35,
+          "max": 37
+        }
+      }
+    ]
+  }
+]

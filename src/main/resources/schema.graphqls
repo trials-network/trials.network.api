@@ -1,0 +1,270 @@
+# Scalars
+scalar DateTime
+scalar Date
+scalar Long
+
+# Enumerations
+
+"""
+Broad category of allergy types
+"""
+enum AllergyType {
+    COCKROACH
+    DUST
+    DRUG
+    EYE
+    FOOD
+    INSECT_STING
+    LATEX
+    MOLD
+    PET
+    RHINITIS
+    SINUS
+    SKIN
+}
+
+enum ConditionState {
+    ACTIVE
+    HISTORY_OF
+    INACTIVE
+}
+
+enum ContactRole {
+    ADMINISTRATIVE
+    DOCTOR
+    MANAGEMENT
+    NURSE
+    OTHER
+}
+
+enum Ethnicity {
+    ASIAN
+    BLACK
+    MIXED
+    OTHER
+    WHITE
+}
+
+enum Gender {
+    FEMALE
+    MALE
+    OTHER
+}
+
+# Types
+
+"""
+Contact for an Institution
+"""
+type InstitutionContact {
+    id: Long!
+    name: String!
+    role: ContactRole!
+    telephone: String
+    email: String!
+    mobile: String
+}
+
+"""
+Healthcare Institution participating in trials.network. Different locations
+of the same parent organisation should each be registered as an institution.
+"""
+type Institution {
+    id: Long!
+    name: String!
+    address: String!
+    """
+    Timezone of this location, e.g. America/New_York
+    """
+    timezone: String!
+    contacts: [InstitutionContact!]
+    patients: [Patient]
+}
+
+"""
+Record of allergy
+"""
+type AllergyRecord {
+    name: String!
+    allergyType: AllergyType!
+    notes: String
+}
+
+"""
+Medical condition
+"""
+type Condition {
+    id: Long!
+    state: ConditionState!
+    medication: [String!]
+    date: Date
+    notes: String
+}
+
+"""
+A value range [min, max)
+"""
+type ValueRange {
+    min: Float
+    max: Float
+}
+
+"""
+Observation range. For each observation type, we can partition
+"""
+type ObservationRange {
+    partition: ValueRange!
+    range: ValueRange!
+}
+
+"""
+Observation made for a patient
+"""
+type Observation {
+    id: Long!
+    observationType: ObservationType!
+    value: Float!
+    valueTime: DateTime!
+}
+
+type ObservationType {
+    id: ID!
+    group: String!
+    name: String!
+    shortName: String!
+    unit: String
+    shortUnit: String
+    displayFormat: String
+    normalRangeSelector: String
+    normalRanges: [ObservationRange!]
+}
+
+"""
+A patient record
+"""
+type Patient {
+    id: Long!
+    name: String
+    institution: Institution!
+    institutionId: String!
+    gender: Gender!
+    ethnicity: Ethnicity
+    dateOfBirth: Date!
+    covidHospitalizationDate: Date!
+    covidSymptomStartDate: Date
+
+    observations: [Observation!]
+    conditions: [Condition!]
+    allergies: [AllergyRecord!]
+}
+
+type OperationResult {
+    success: Boolean!
+}
+
+# Entry Point
+type Query {
+    """List of institutions"""
+    institutions: [Institution!]
+
+    """Get an institution by ID"""
+    institution(id: Long!): Institution
+
+    """List of all patients"""
+    patients: [Patient!]
+
+    """Get an patient by ID"""
+    patient(id: Long): Patient
+
+    """Get a patient by institution ID"""
+    patientByInstitution(institution: Long!, patientId: String!): Patient,
+
+    """Get list of observation types"""
+    observationTypes: [ObservationType!]
+}
+
+input PatientInput {
+    institutionId: Long,
+    name: String,
+    gender: Gender!
+    ethnicity: Ethnicity
+    dateOfBirth: Date!
+    covidHospitalizationDate: Date!
+    covidSymptomStartDate: Date
+}
+
+input InstitutionInput {
+    name: String!
+    address: String!
+    timezone: String!
+}
+
+input InstitutionContactInput {
+    name: String!
+    role: ContactRole!
+    telephone: String
+    email: String!
+    mobile: String
+}
+
+input ObservationInput {
+    observationTypeId: String!
+    value: Float!
+    valueTime: DateTime!
+    recordedTime: DateTime!
+    notes: String
+}
+
+
+type Mutation {
+    """
+    Add a new patient to the system
+    """
+    addPatient(patient: PatientInput!): Patient
+
+    """
+    Update details of an existing patient
+    """
+    updatePatient(id: Long!, patient: PatientInput): Patient
+
+    """
+    Register an institution
+    """
+    addInstitution(institution: InstitutionInput!): Institution
+
+    """
+    Update an institution's details
+    """
+    updateInstitution(id: Long!, institution: InstitutionInput!): Institution
+
+    """
+    Add a contact for an institution
+    """
+    addInstitutionContact(institutionId: Long!, contact: InstitutionContactInput!): InstitutionContact
+
+    """
+    Update a contact for an institution
+    """
+    updateInstitutionContact(id: Long!, contact: InstitutionContactInput!): InstitutionContact
+
+    """
+    Remove an institution's contact
+    """
+    removeInstitutionContact(id: Long!): OperationResult
+
+    """
+    Add an patient's observation
+    """
+    addObservation(patientId: Long!, observation: ObservationInput!): Observation
+
+    """
+    Remove an observation ??
+    """
+    removeObservation(id: Long!, deletionNotes: String): OperationResult
+
+    """
+    Update an existing observation
+    """
+    updateObservation(id: Long!, observation: ObservationInput!): Observation
+
+}
